@@ -138,7 +138,7 @@ namespace ZJYC
         }
         public ITEMS(string FileName)
         {
-            this.JsonFileName = FileName;
+            JsonFileName = FileName;
             Read();
         }
         public ITEMS()
@@ -157,11 +157,20 @@ namespace ZJYC
             }
             return Res;
         }
+        public List<ITEM> GetCopy()
+        {
+            List<ITEM> Temp = new List<ITEM>();
+            foreach (ITEM Item in Internal) Temp.Add(Item);
+            return Temp;
+        }
     }
     public class ITEM
     {
         public int UniqueID = 0;
         public Dictionary<string, string> MainBody = new Dictionary<string, string>() {
+            {"Type","单词" },
+            {"JP","XXX" },
+            {"CH","XXX" },
             {"ErrorRate","0.0"},
             {"LearnCount","1" },
             {"ErrorCount","0" },
@@ -429,12 +438,14 @@ namespace ZJYC
             }
         }
     }
-
     public class PARAM
     {
         public void ParamParse(string SortConfigParam, ref double CountMin, ref double CountMax)
         {
             double Min = 0, Max = 0;
+
+            if (SortConfigParam == "") return;
+
             if (SortConfigParam.Contains("-") == true)
             {
                 string[] Split = SortConfigParam.Split('-');
@@ -450,12 +461,11 @@ namespace ZJYC
             CountMax = (Min <= Max ? Max : Min);
         }
     }
-
     public class FILTER : PARAM
     {
         public string Param = string.Empty;
         public string Mode = string.Empty;
-        public List<string> SupportedMode = new List<string>() { "创建时间","学习时间","学习次数", "错误次数", "错误概率" };
+        public List<string> SupportedMode = new List<string>() { "全部全部","创建时间","学习时间","学习次数", "错误次数", "错误概率" };
         public ITEMS Items;
 
         public FILTER(ref ITEMS Items)
@@ -472,7 +482,7 @@ namespace ZJYC
         }
         public bool CanPassByCreatedTim(ITEM Item, double Min, double Max)
         {
-            DateTime Cur = DateTime.Parse(Item.MainBody["CreatedTime"]);
+            DateTime Cur = DateTime.Parse(Item.MainBody["CreateTime"]);
             DateTime End = DateTime.Now.AddDays(-1 * Min);
             DateTime Sta = DateTime.Now.AddDays(-1 * Max);
             if(DateTime.Compare(Cur, Sta) > 0 && DateTime.Compare(Cur, End) < 0)
@@ -540,30 +550,36 @@ namespace ZJYC
                 return false;
             }
         }
-        public void WORK(ref List<ITEM> IN,ref List<ITEM> OUT)
+        public void WORK(ref List<ITEM> IN)
         {
             CanPassDelegate CanPass = CanPassDefault;
             double Min = 0, Max = 0;
-            OUT.Clear();
+            if (Mode == "全部全部") return;
             ParamParse(Param, ref Min, ref Max);
             if (Mode == "创建时间") CanPass = CanPassByCreatedTim;
             if (Mode == "学习时间") CanPass = CanPassByLearnedTim;
             if (Mode == "学习次数") CanPass = CanPassByLearnedCnt;
             if (Mode == "错误次数") CanPass = CanPassByErrorCount;
             if (Mode == "错误概率") CanPass = CanPassByErrorRatex;
-            foreach (ITEM Item in IN)
+            for (int i = 0;i < IN.Count;)
             {
-                if (CanPass(Item,Min,Max) == true) OUT.Add(Item);
+                if (CanPass(IN[i], Min, Max) == true)
+                {
+                    i++; 
+                }
+                else
+                {
+                    IN.Remove(IN[i]);
+                }
             }
         }
 
     }
-
     public class SORTER : PARAM
     {
         public string Param = string.Empty;
         public string Mode = string.Empty;
-        public List<string> SupportedMode = new List<string>() { "创建时间", "学习时间", "学习次数", "错误次数", "错误概率" };
+        public List<string> SupportedMode = new List<string>() { "无无无无","创建时间", "学习时间", "学习次数", "错误次数", "错误概率" };
         public ITEMS Items;
 
         public SORTER(ref ITEMS Items)
@@ -611,22 +627,21 @@ namespace ZJYC
             return 0;
         }
 
-        public void WORK(ref List<ITEM> IN, ref List<ITEM> OUT)
+        public void WORK(ref List<ITEM> IN)
         {
-            Items.CopyItems(ref IN, ref OUT);
-            if (Mode == "创建时间") OUT.Sort(SortByCreateTime);
-            if (Mode == "学习时间") OUT.Sort(SortByLearndTime);
-            if (Mode == "学习次数") OUT.Sort(SortByLearnCount);
-            if (Mode == "错误次数") OUT.Sort(SortByErrorCount);
-            if (Mode == "错误概率") OUT.Sort(SortByErrorRatex);
+            if (Mode == "无无无无") return;
+            if (Mode == "创建时间") IN.Sort(SortByCreateTime);
+            if (Mode == "学习时间") IN.Sort(SortByLearndTime);
+            if (Mode == "学习次数") IN.Sort(SortByLearnCount);
+            if (Mode == "错误次数") IN.Sort(SortByErrorCount);
+            if (Mode == "错误概率") IN.Sort(SortByErrorRatex);
         }
     }
-
     public class SELECT : PARAM
     {
         public string Param = string.Empty;
         public string Mode = string.Empty;
-        public List<string> SupportedMode = new List<string>() { "前几个项", "后几个项", "设定起始" };
+        public List<string> SupportedMode = new List<string>() { "无无无无","前几个项", "后几个项", "设定起始" };
         public ITEMS Items;
 
         public SELECT(ref ITEMS Items)
@@ -635,16 +650,15 @@ namespace ZJYC
             Mode = SupportedMode[0];
         }
 
-        public void WORK(ref List<ITEM> IN, ref List<ITEM> OUT)
+        public void WORK(ref List<ITEM> IN)
         {
             double Min = 0, Max = 0;
-            OUT.Clear();
+            if (Mode == "无无无无") return;
             ParamParse(Param, ref Min, ref Max);
-
             if (Mode == "前几个项") { Max = Min; Min = 0; }
             if (Mode == "后几个项") { Max = IN.Count - 1; Min = Max - Min; }
-            if (Mode == "设定起始") { ; }
-
+            if (Mode == "设定起始") {; }
+            List<ITEM> OUT = new List<ITEM>();
             for (int i = 0; i < IN.Count; i++)
             {
                 if (((int)Min <= i) && (i <= (int)Max))
@@ -652,7 +666,66 @@ namespace ZJYC
                     OUT.Add(IN[i]);
                 }
             }
+            IN.Clear();
+            foreach (ITEM Item in OUT) IN.Add(Item);
         }
+    }
+
+    public class GUI
+    {
+        public class CacheForTable
+        {
+            public string Type { get; set; }
+            public string JP { get; set; }
+            public string CH { get; set; }
+            public string ErrorRate { get; set; }
+            public string LearnCount { get; set; }
+            public string ErrorCount { get; set; }
+            public string LearnxTime { get; set; }
+        }
+        public List<CacheForTable> Show = new List<CacheForTable>();
+        public List<ITEM> Internal = new List<ITEM>();
+        public ITEMS Items;
+        public FILTER Filter;
+        public SORTER Sorter;
+        public SELECT Select;
+        public int CurSelectedIndex = -1;
+
+        public GUI()
+        {
+            Items = new ITEMS("Temp.json");
+            Filter = new FILTER(ref Items);
+            Sorter = new SORTER(ref Items);
+            Select = new SELECT(ref Items);
+        }
+
+        public int ImportItems()
+        {
+            Internal.Clear();
+            Internal = Items.GetCopy();
+            Filter.WORK(ref Internal);
+            Sorter.WORK(ref Internal);
+            Select.WORK(ref Internal);
+
+            Show.Clear();
+
+            foreach(ITEM Item in Internal)
+            {
+                Show.Add(new CacheForTable()
+                {
+                    Type = Item.MainBody["Type"],
+                    JP = Item.MainBody["JP"],
+                    CH = Item.MainBody["CH"],
+                    ErrorRate = Item.MainBody["ErrorRate"],
+                    LearnCount = Item.MainBody["LearnCount"],
+                    ErrorCount = Item.MainBody["ErrorCount"],
+                    LearnxTime = Item.MainBody["LearnxTime"],
+                });
+            }
+
+            return Internal.Count;
+        }
+
     }
 
 }

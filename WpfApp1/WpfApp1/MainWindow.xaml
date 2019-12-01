@@ -1,0 +1,59 @@
+﻿<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="556" Width="900" ResizeMode="CanMinimize" FontSize="20" FontWeight="Bold">
+    <Window.Resources>
+        <Color x:Key="Button">#FF990C0C</Color>
+    </Window.Resources>
+    <Grid>
+        <TabControl HorizontalAlignment="Left" Height="518" VerticalAlignment="Top" Width="884">
+            <TabItem Header="TabItem">
+                <Grid Background="#FFE5E5E5">
+                    <Button Content="OpenDic" HorizontalAlignment="Left" VerticalAlignment="Top" Width="170" Height="43" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E"/>
+                    <TextBox HorizontalAlignment="Left" Height="43" Margin="350,0,0,0" TextWrapping="Wrap" Text="DicPath" VerticalAlignment="Top" Width="524" Foreground="#FF03097E" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+                        <TextBox.Background>
+                            <SolidColorBrush Color="#FF04E0AE"/>
+                        </TextBox.Background>
+                    </TextBox>
+                    <Button Content="CreateNewDic" HorizontalAlignment="Left" VerticalAlignment="Top" Width="170" Height="43" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="175,0,0,0"/>
+                    <Button Content="Import" HorizontalAlignment="Left" VerticalAlignment="Top" Width="170" Height="43" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="0,48,0,0"/>
+                    <Button Content="Export" HorizontalAlignment="Left" VerticalAlignment="Top" Width="170" Height="43" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="175,48,0,0"/>
+                    <TextBox HorizontalAlignment="Left" Height="43" Margin="350,48,0,0" TextWrapping="Wrap" Text="DicPath" VerticalAlignment="Top" Width="524" Foreground="#FF03097E" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="#FF04E0AE"/>
+                    <Button Content="Search" HorizontalAlignment="Left" VerticalAlignment="Top" Width="170" Height="43" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="175,96,0,0"/>
+                    <ComboBox x:Name="FilterMode" HorizontalAlignment="Left" Margin="350,96,0,0" VerticalAlignment="Top" Width="125" Height="43" Background="#FF04E0AE" Foreground="#FF03097E" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <TextBox x:Name="ShowCount" HorizontalAlignment="Left" Height="43" Margin="740,144,0,0" TextWrapping="Wrap" Text="Cnt" VerticalAlignment="Top" Width="134" Foreground="#FF03097E" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="#FF04E0AE" RenderTransformOrigin="0.45,0.977"/>
+                    <TextBox x:Name="TheValOfKey" HorizontalAlignment="Left" Height="43" Margin="175,144,0,0" TextWrapping="Wrap" Text="CurSelected" VerticalAlignment="Top" Width="170" Foreground="#FF03097E" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="#FF04E0AE"/>
+                    <ComboBox x:Name="ItemsKeys" HorizontalAlignment="Left" Margin="0,144,0,0" VerticalAlignment="Top" Width="170" Height="43" Background="#FF04E0AE" Foreground="#FF03097E"/>
+                    <Button x:Name="ItemsAdd" Content="Add" HorizontalAlignment="Left" VerticalAlignment="Top" Width="125" Height="43" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="350,144,0,0" Click="ItemsAdd_Click"/>
+                    <Button x:Name="ItemsMod" Content="Modify" HorizontalAlignment="Left" VerticalAlignment="Top" Width="125" Height="43" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="480,144,0,0" Click="ItemsMod_Click"/>
+                    <Button x:Name="ItemsDel" Content="Del" HorizontalAlignment="Left" VerticalAlignment="Top" Width="125" Height="43" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="610,144,0,0" Click="ItemsDel_Click"/>
+                    <TextBox x:Name="FilterParam" HorizontalAlignment="Left" Height="43" Margin="480,96,0,0" TextWrapping="Wrap" Text="1-3" VerticalAlignment="Top" Width="49" Foreground="#FF03097E" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="#FF04E0AE"/>
+                    <ComboBox x:Name="SorterMode" HorizontalAlignment="Left" Margin="534,96,0,0" VerticalAlignment="Top" Width="125" Height="43" Background="#FF04E0AE" Foreground="#FF03097E" RenderTransformOrigin="2.412,0.86" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <ComboBox x:Name="SelectMode" HorizontalAlignment="Left" Margin="664,96,0,0" VerticalAlignment="Top" Width="125" Height="43" Background="#FF04E0AE" Foreground="#FF03097E" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    <TextBox x:Name="SelectParam" HorizontalAlignment="Left" Height="43" Margin="794,96,0,0" TextWrapping="Wrap" Text="0-99" VerticalAlignment="Top" Width="80" Foreground="#FF03097E" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="#FF04E0AE"/>
+                    <TextBox HorizontalAlignment="Left" Height="43" Margin="0,96,0,0" TextWrapping="Wrap" Text="Keyword" VerticalAlignment="Top" Width="170" Foreground="#FF03097E" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="#FF04E0AE"/>
+                    <ListView x:Name="GUI_Listview" HorizontalAlignment="Left" Height="284" Margin="0,192,0,0" VerticalAlignment="Top" Width="874" FontSize="12" ItemsSource="{Binding}" Background="#FF04E0AE" Foreground="#FF03097E" SelectionChanged="GUI_Listview_SelectionChanged" >
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="50" Header="Type" DisplayMemberBinding="{Binding Path=Type}" />
+                                <GridViewColumn Width="220" Header="JP" DisplayMemberBinding="{Binding Path=JP}" />
+                                <GridViewColumn Width="220" Header="CH" DisplayMemberBinding="{Binding Path=CH}" />
+                                <GridViewColumn Width="80" Header="ErrorRate" DisplayMemberBinding="{Binding Path=ErrorRate}" />
+                                <GridViewColumn Width="80" Header="ErrorCount" DisplayMemberBinding="{Binding Path=ErrorCount}" />
+                                <GridViewColumn Width="80" Header="LearnCount" DisplayMemberBinding="{Binding Path=LearnCount}" />
+                                <GridViewColumn Width="140" Header="LearnxTime" DisplayMemberBinding="{Binding Path=LearnxTime}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </TabItem>
+            <TabItem Header="TabItem">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
