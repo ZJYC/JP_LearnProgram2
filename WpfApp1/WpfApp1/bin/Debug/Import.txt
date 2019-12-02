@@ -1,0 +1,28 @@
+$JP         $ksdfhkas
+$CH         $啊啊啊啊
+$Type       $单词
+$JPEX1      $adsfghksdhglksdfh
+$CHEX1      $adsfghksdhglksdfh
+$USAGE      $adsfghksdhglksdfh
+$HRGN       $adsfghksdhglksdfh
+
+$JP         $ksdfhkas
+$CH         $啊啊啊啊
+$Type       $单词
+$JPEX1      $adsfghksdhglksdfh
+$CHEX1      $adsfghksdhglksdfh
+$USAGE      $adsfghksdhglksdfh
+$HRGN       $adsfghksdhglksdfh
+
+$JP         $ksdfhkas
+$CH         $啊啊啊啊
+$Type       $单词
+$JPEX1      $adsfghksdhglksdfh
+$CHEX1      $adsfghksdhglksdfh
+$USAGE      $adsfghksdhglksdfh
+$HRGN       $adsfghksdhglksdfh
+
+
+
+
+

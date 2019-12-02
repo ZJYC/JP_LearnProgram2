@@ -5,19 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Windows;
 
 namespace ZJYC
 {
-    public class ITEMS
+
+    public class FILEOPT
     {
-        public string JsonFileName = "Temp.json";
-        public List<ITEM> Internal = new List<ITEM>();
-        public void CopyItems(ref List<ITEM> Src, ref List<ITEM> Dst)
-        {
-            Dst.Clear();
-            for (int i = 0; i < Src.Count; i++) Dst.Add(Src[i]);
-        }
-        private void ReadStringFrJsonFile(string JsonFileName, ref string Content)
+        public void ReadStringFrJsonFile(string JsonFileName, ref string Content)
         {
             try
             {
@@ -31,7 +26,7 @@ namespace ZJYC
                 ;//MessageBox.Show("ReadStringFrJsonFile" + JsonFileName);
             }
         }
-        private void WritStringToJsonFile(string JsonFileName, ref string Content)
+        public void WritStringToJsonFile(string JsonFileName, ref string Content)
         {
             try
             {
@@ -46,10 +41,22 @@ namespace ZJYC
                 ;// MessageBox.Show("WritJsonFile" + JsonFileName);
             }
         }
+
+    }
+    public class ITEMS
+    {
+        private FILEOPT JsonFile = new FILEOPT();
+        public string JsonFileName = "Temp.json";
+        public List<ITEM> Internal = new List<ITEM>();
+        public void CopyItems(ref List<ITEM> Src, ref List<ITEM> Dst)
+        {
+            Dst.Clear();
+            for (int i = 0; i < Src.Count; i++) Dst.Add(Src[i]);
+        }
         public void Read()
         {
             string TempString = string.Empty;
-            ReadStringFrJsonFile(JsonFileName, ref TempString);
+            JsonFile.ReadStringFrJsonFile(JsonFileName, ref TempString);
             Internal = JsonConvert.DeserializeObject<List<ITEM>>(TempString);
             //CopyItems(ref Internal,ref External);
         }
@@ -58,7 +65,7 @@ namespace ZJYC
             int i = 0;
             foreach (ITEM Item in Internal)Item.UniqueID = i++;
             string TempString = JsonConvert.SerializeObject(Internal);
-            WritStringToJsonFile(this.JsonFileName, ref TempString);
+            JsonFile.WritStringToJsonFile(this.JsonFileName, ref TempString);
             //CopyItems(ref Internal, ref External);
         }
         public int GetIndexByID(int ID)
@@ -124,17 +131,12 @@ namespace ZJYC
                 }
             }
         }
-        public void CreatJsonWithSomeContent()
+        public void CreatJsonWithSomeContent(string FileName)
         {
-            for(int i = 0;i < 10;i++)
-            {
-                Internal.Add(new ITEM());
-            }
-
-            JsonFileName = "Temp.json";
-
+            Internal.Clear();
+            Internal.Add(new ITEM());
+            JsonFileName = FileName;
             Writ();
-
         }
         public ITEMS(string FileName)
         {
@@ -371,7 +373,6 @@ namespace ZJYC
         public List<int> IndexRandom = new List<int>();
         public List<int> IndexSelect = new List<int>();
         public int ItemID = 0;
-       
         public void ImportItems(ref List<ITEM> Base,string Mode)
         {
             Internal.Clear();
@@ -383,8 +384,11 @@ namespace ZJYC
             IndexSelect = (Mode == "顺序" ? IndexRegulr : IndexSelect);
             IndexSelect = (Mode == "随机" ? IndexRandom : IndexSelect);
         }
-        public void GenOneQuestion(string KeyForQuestion,string KeyForAnswer,
-            List<string> ShowForQuestion,List<string> ShowForAnswer)
+        public void GenOneQuestion(
+            string KeyForQuestion,
+            string KeyForAnswer,
+            List<string> ShowForQuestion,
+            List<string> ShowForAnswer)
         {
             if(IndexSelect.Count <= 0)int.Parse("");
             int Index = IndexSelect[0];
@@ -670,7 +674,46 @@ namespace ZJYC
             foreach (ITEM Item in OUT) IN.Add(Item);
         }
     }
+    public class SEARCH
+    {
+        public ITEMS Items;
+        public string Keyword = string.Empty;
+        TEXT Text = new TEXT();
+        public SEARCH(ref ITEMS Items)
+        {
+            this.Items = Items;
+        }
+        private bool ShouldRemoveThisItem(ITEM Item)
+        {
+            if (Keyword == "") return false;
+            List<string> Keys = new List<string>();
+            foreach (string str in Item.MainBody.Keys) Keys.Add(str);
+            foreach (string str in Keys)
+            {
+                if (Text.Sim(Item.MainBody[str], Keyword) >= 0.2)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
+        public void WORK(ref List<ITEM> IN)
+        {
+            for(int i = 0;i < IN.Count;)
+            {
+                if (ShouldRemoveThisItem(IN[i]) == true)
+                {
+                    IN.Remove(IN[i]);
+                }
+                else
+                {
+                    i++;
+                }
+            }
+        }
+
+    }
     public class GUI
     {
         public class CacheForTable
@@ -689,6 +732,9 @@ namespace ZJYC
         public FILTER Filter;
         public SORTER Sorter;
         public SELECT Select;
+        public SEARCH Search;
+        public IMPORT Import;
+        public EXPORT Export;
         public int CurSelectedIndex = -1;
 
         public GUI()
@@ -697,12 +743,16 @@ namespace ZJYC
             Filter = new FILTER(ref Items);
             Sorter = new SORTER(ref Items);
             Select = new SELECT(ref Items);
+            Search = new SEARCH(ref Items);
+            Import = new IMPORT(ref Items);
+            Export = new EXPORT(ref Items);
         }
 
         public int ImportItems()
         {
             Internal.Clear();
             Internal = Items.GetCopy();
+            Search.WORK(ref Internal);
             Filter.WORK(ref Internal);
             Sorter.WORK(ref Internal);
             Select.WORK(ref Internal);
@@ -727,7 +777,190 @@ namespace ZJYC
         }
 
     }
+    public class IMPORT
+    {
 
+        ITEMS Items;
+
+        public IMPORT(ref ITEMS Items)
+        {
+            this.Items = Items;
+        }
+
+        private FILEOPT JsonFile = new FILEOPT();
+        //$JP$ksdfhkas
+        //$CH$啊啊啊啊
+        //$Type$单词
+        //$JPEX1$adsfghksdhglksdfh
+        //$CHEX1$adsfghksdhglksdfh
+        //$USAGE$adsfghksdhglksdfh
+        //$HRGN$adsfghksdhglksdfh
+
+        //$JP$ksdfhkas
+        //$CH$啊啊啊啊
+        //$Type$单词
+        //$JPEX1$adsfghksdhglksdfh
+        //$CHEX1$adsfghksdhglksdfh
+        //$USAGE$adsfghksdhglksdfh
+        //$HRGN$adsfghksdhglksdfh
+
+        public bool ChkFileForImport(string FileName)
+        {
+            string Keyword = "$";
+
+            //List<string> Content = new List<string>();
+            try
+            {
+                using (StreamReader Reader = new StreamReader(FileName))
+                {
+                    string Content = Reader.ReadToEnd();
+                    List<int> ErrorLine = new List<int>();
+                    Content = Content.Replace(" ", "");
+                    Content = Content.Replace("\r\n\r\n", "\r\n");
+                    Content = Content.Replace("\r\n"," ");
+                    string[] SunString = Content.Split(' ');
+
+                    for (int i = 0;i < SunString.Length; i++)
+                    {
+                        int Index = 0;
+                        int Count = 0;
+                        while ((Index = SunString[i].IndexOf(Keyword, Index)) != -1)
+                        {
+                            Count++;
+                            Index = Index + Keyword.Length;
+                        }
+                        if (SunString[i] != "" && Count != 2 && Count != 0)
+                        {
+                            ErrorLine.Add(i + 1);
+                        }
+                    }
+                    if (ErrorLine.Count != 0)
+                    {
+                        string Message = string.Empty;
+                        foreach (int i in ErrorLine) Message += i.ToString();
+                        MessageBox.Show("File error occur @ Line " + Message);
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            catch
+            {
+                ;//MessageBox.Show("ReadStringFrJsonFile" + JsonFileName);
+            }
+            return false;
+        }
+
+        public void WORK(string ImportFileName,string JsonFileName)
+        {
+            string Content = string.Empty;
+            if(JsonFileName == string.Empty)
+            {
+                MessageBox.Show("先创建一个字典吧");
+                return;
+            }
+
+            if(ChkFileForImport(ImportFileName) != true)
+            {
+                MessageBox.Show("文件格式不对啊");
+                return;
+            }
+
+            JsonFile.ReadStringFrJsonFile(ImportFileName, ref Content);
+            Content = Content.Replace(" ","");
+            Content = Content.Replace("\r\n\r\n", " ");
+            Content = Content.Replace("  ", " ");
+            string[] Sub = Content.Split(' ');
+            List<ITEM> ItemList = new List<ITEM>();
+            foreach(string Segment in Sub)
+            {
+                if(Segment != "")
+                {
+                    ITEM Item = new ITEM();
+                    string[] Line = Segment.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+                    foreach(string Element in Line)
+                    {
+                        string [] E = Element.Split('$');
+                        string Key = E[1];
+                        string Val = E[2];
+                        string Temp = string.Empty;
+                        if(Item.MainBody.TryGetValue(Key,out Temp))
+                        {
+                            Item.MainBody[Key] = Val;
+                        }
+                        else
+                        {
+                            Item.MainBody.Add(Key,Val);
+                        }
+                    }
+                    ItemList.Add(Item);
+                }
+            }
+            if(ItemList.Count != 0)
+            {
+                Items.Add(ItemList);
+                Items.Writ();
+            }
+
+        }
+    }
+    public class EXPORT
+    {
+        ITEMS Items;
+
+        public EXPORT(ref ITEMS Items)
+        {
+            this.Items = Items;
+        }
+        FILEOPT File = new FILEOPT();
+
+        public string GetSpecificLenOfSpace(int Num)
+        {
+            string Res = string.Empty;
+            for (int i = 0; i < Num; i++) Res += " ";
+            return Res;
+        }
+
+        public void WORK(ref List<ITEM> Items,string ExportFileName,string JsonFileName)
+        {
+            if (ExportFileName == string.Empty)
+            {
+                MessageBox.Show("先创建一个导出文件吧");
+                return;
+            }
+            if (JsonFileName == string.Empty)
+            {
+                MessageBox.Show("先打开一个JSON文件吧");
+                return;
+            }
+            if(Items.Count == 0)
+            {
+                MessageBox.Show("到处项目为空");
+                return;
+            }
+
+            string ExportString = string.Empty;
+
+            foreach(ITEM Item in Items)
+            {
+                int MaxKeyLen = 0;
+                foreach (string Key in Item.MainBody.Keys)
+                {
+                    MaxKeyLen = (MaxKeyLen < Key.Length ? Key.Length : MaxKeyLen);
+                }
+                foreach (string Key in Item.MainBody.Keys)
+                {
+                    ExportString += "$ " + Key + GetSpecificLenOfSpace(MaxKeyLen - Key.Length) + " $ " + Item.MainBody[Key] + " \r\n";
+                }
+                ExportString += "\r\n";
+            }
+
+            File.WritStringToJsonFile(ExportFileName, ref ExportString);
+
+            MessageBox.Show("导出成功");
+
+        }
+    }
 }
 namespace TextOpt
 {

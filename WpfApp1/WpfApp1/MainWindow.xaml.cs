@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,6 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
-
         GUI Gui = new GUI();
 
         public void UpdateListView()
@@ -85,6 +85,73 @@ namespace WpfApp1
         {
             if (Gui.CurSelectedIndex < 0) return;
             Gui.Items.Del(Gui.Internal[Gui.CurSelectedIndex].UniqueID);
+        }
+
+        private void OpenDicButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Multiselect = false;
+            fileDialog.RestoreDirectory = true;
+            fileDialog.Title = "请打开Json文件";
+            fileDialog.Filter = "Json|*.json;";
+            if (fileDialog.ShowDialog() == true)
+            {
+                DicName.Text = fileDialog.FileName;
+                Gui.Items.JsonFileName = DicName.Text;
+                Gui.Items.Read();
+                UpdateListView();
+            }
+        }
+
+        private void CreateNewDicButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "Json files (*.json)|*.json";
+            saveFileDialog1.RestoreDirectory = true;
+            if (saveFileDialog1.ShowDialog() == true && saveFileDialog1.FileName.Length > 0)
+            {
+                DicName.Text = saveFileDialog1.FileName;
+                Gui.Items.Writ();
+                Gui.Items.CreatJsonWithSomeContent(DicName.Text);
+                UpdateListView();
+            }
+        }
+
+        private void ImportFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Multiselect = false;
+            fileDialog.RestoreDirectory = true;
+            fileDialog.Title = "请打开Txt文件";
+            fileDialog.Filter = "txt|*.txt;";
+            if (fileDialog.ShowDialog() == true)
+            {
+                ImExportFileName.Text = fileDialog.FileName;
+                Gui.Import.WORK(ImExportFileName.Text, DicName.Text);
+                UpdateListView();
+            }
+        }
+
+        private void ExportFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "txt files (*.txt)|*.txt";
+            saveFileDialog1.RestoreDirectory = true;
+            if (saveFileDialog1.ShowDialog() == true && saveFileDialog1.FileName.Length > 0)
+            {
+                ImExportFileName.Text = saveFileDialog1.FileName;
+                Gui.Export.WORK(ref Gui.Internal, ImExportFileName.Text, DicName.Text);
+            }
+        }
+
+        private void Keyword_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Gui.Search.Keyword = Keyword.Text;
+        }
+
+        private void RefreshAll_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateListView();
         }
     }
 }
