@@ -100,7 +100,7 @@ namespace ZJYC
                     Internal[Index].MainBody.Add(Keys[i], Vals[i]);
                 }
             }
-            Internal[Index].MainBody["LastLearnTime"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            Internal[Index].MainBody["LearnxTime"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
         public void Mod(int ID,int ErrorCnt)
         {
@@ -112,7 +112,7 @@ namespace ZJYC
             Internal[Index].MainBody["ErrorRate"] = ErrorRate.ToString();
             Internal[Index].MainBody["LearnCount"] = LearnCount.ToString();
             Internal[Index].MainBody["ErrorCount"] = ErrorCount.ToString();
-            Internal[Index].MainBody["LastLearnTime"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            Internal[Index].MainBody["LearnxTime"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
         public void Del(int ID)
         {
@@ -164,6 +164,18 @@ namespace ZJYC
             List<ITEM> Temp = new List<ITEM>();
             foreach (ITEM Item in Internal) Temp.Add(Item);
             return Temp;
+        }
+        public string GetValOfKey(string Key,ITEM Item)
+        {
+            string Temp = "";
+            if(Item.MainBody.TryGetValue(Key,out Temp))
+            {
+                return Temp;
+            }
+            else
+            {
+                return "";
+            }
         }
     }
     public class ITEM
@@ -367,6 +379,7 @@ namespace ZJYC
             public string Question = string.Empty;
             public string RightAnswer = string.Empty;
             public string UserSelected = string.Empty;
+            public string Result = string.Empty;
         }
         public OUT Out = new OUT();
         public string Mode = string.Empty;
@@ -395,34 +408,74 @@ namespace ZJYC
             IndexSelect = (Mode == "随机" ? IndexRandom : IndexSelect);
         }
         public void GenOneQuestion(
-            string KeyForQuestion,
-            string KeyForAnswer,
+            List<string> KeyToGenOptions,
             List<string> ShowForQuestion,
-            List<string> ShowForAnswer)
+            List<string> ShowForAnswer,
+            List<string> ShowForRes)
         {
-            if(IndexSelect.Count <= 0)int.Parse("");
+            if (IndexSelect.Count <= 0)
+            {
+                MessageBox.Show("列表已为空");
+                return;
+            }
             int Index = IndexSelect[0];
             IndexSelect.Remove(Index);
 
-            List<ITEM> SimItems = Text.FindTopSim(ref Items, 
-                new List<string> { KeyForQuestion }, 
-                new List<string> { KeyForAnswer }, 
-                Internal[Index].UniqueID, 4);
+            List<string> KeyOfVals = new List<string>();
 
+            foreach(string str in KeyToGenOptions)
+            {
+                string Temp = "";
+                if(Internal[Index].MainBody.TryGetValue(str,out Temp))
+                {
+                    KeyOfVals.Add(Temp);
+                }
+                else
+                {
+                    KeyOfVals.Add("");
+                }
+            }
+
+
+            List<ITEM> SimItems = Text.FindTopSim(
+                ref Items, KeyToGenOptions, KeyOfVals, Internal[Index].UniqueID, 3);
             Out.Question = "";
+            Out.RightAnswer = "";
+            Out.Result = "";
 
             foreach (string str in ShowForQuestion)
             {
                 string Temp = "";
                 if (Internal[Index].MainBody.TryGetValue(str, out Temp))
                 {
-                    Out.Question += Temp;
+                    Out.Question += Temp + "\r\n";
                 }
             }
 
-            Out.Options.Clear();
+            foreach (string str in ShowForAnswer)
+            {
+                string Temp = "";
+                if (Internal[Index].MainBody.TryGetValue(str, out Temp))
+                {
+                    Out.RightAnswer += Temp + "\r\n";
+                }
+            }
 
-            for (int i = 0;i < 4;i++)
+            foreach (string str in ShowForRes)
+            {
+                string Temp = "";
+                if (Internal[Index].MainBody.TryGetValue(str, out Temp))
+                {
+                    Out.Result += Temp + "\r\n";
+                }
+            }
+
+
+            List<string> Options = new List<string>();
+
+            Options.Clear();
+
+            for (int i = 0;i < 3;i++)
             {
                 string Temp = "";
                 string Answer = "";
@@ -430,12 +483,20 @@ namespace ZJYC
                 {
                     if(SimItems[i].MainBody.TryGetValue(str,out Temp))
                     {
-                        Answer += Temp;
+                        Answer += Temp + "\r\n";
                     }
                 }
-                Out.Options.Add(Answer);
+                Options.Add(Answer);
             }
-            Out.RightAnswer = Out.Options[0];
+            Options.Add(Out.RightAnswer);
+
+            List<int> Random = GenList.List(0, 3);
+            Out.Options.Clear();
+            Out.Options.Add(Options[Random[0]]);
+            Out.Options.Add(Options[Random[1]]);
+            Out.Options.Add(Options[Random[2]]);
+            Out.Options.Add(Options[Random[3]]);
+
             Out.IdSelected = Internal[Index].UniqueID;
         }
         public bool JudgeTheAnswer()
@@ -443,11 +504,13 @@ namespace ZJYC
             if(Out.UserSelected == Out.RightAnswer)
             {
                 Items.Mod(Out.IdSelected, 0);
+                Items.Writ();
                 return true;
             }
             else
             {
                 Items.Mod(Out.IdSelected, 1);
+                Items.Writ();
                 return false;
             }
         }
@@ -514,7 +577,7 @@ namespace ZJYC
         }
         public bool CanPassByLearnedTim(ITEM Item, double Min, double Max)
         {
-            DateTime Cur = DateTime.Parse(Item.MainBody["LastLearnTime"]);
+            DateTime Cur = DateTime.Parse(Item.MainBody["LearnxTime"]);
             DateTime End = DateTime.Now.AddDays(-1 * Min);
             DateTime Sta = DateTime.Now.AddDays(-1 * Max);
             if (DateTime.Compare(Cur, Sta) > 0 && DateTime.Compare(Cur, End) < 0)
@@ -597,7 +660,7 @@ namespace ZJYC
     {
         public string Param = string.Empty;
         public string Mode = string.Empty;
-        public List<string> SupportedMode = new List<string>() { "无无无无","创建时间", "学习时间", "学习次数", "错误次数", "错误概率" };
+        public List<string> SupportedMode = new List<string>() { "全部全部","创建时间", "学习时间", "学习次数", "错误次数", "错误概率" };
         public ITEMS Items;
 
         public SORTER(ref ITEMS Items)
@@ -647,7 +710,7 @@ namespace ZJYC
 
         public void WORK(ref List<ITEM> IN)
         {
-            if (Mode == "无无无无") return;
+            if (Mode == "全部全部") return;
             if (Mode == "创建时间") IN.Sort(SortByCreateTime);
             if (Mode == "学习时间") IN.Sort(SortByLearndTime);
             if (Mode == "学习次数") IN.Sort(SortByLearnCount);
@@ -659,7 +722,7 @@ namespace ZJYC
     {
         public string Param = string.Empty;
         public string Mode = string.Empty;
-        public List<string> SupportedMode = new List<string>() { "无无无无","前几个项", "后几个项", "设定起始" };
+        public List<string> SupportedMode = new List<string>() { "全部全部","前几个项", "后几个项", "设定起始" };
         public ITEMS Items;
 
         public SELECT(ref ITEMS Items)
@@ -671,11 +734,11 @@ namespace ZJYC
         public void WORK(ref List<ITEM> IN)
         {
             double Min = 0, Max = 0;
-            if (Mode == "无无无无") return;
+            if (Mode == "全部全部") return;
             ParamParse(Param, ref Min, ref Max);
-            if (Mode == "前几个项") { Max = Min; Min = 0; }
-            if (Mode == "后几个项") { Max = IN.Count - 1; Min = Max - Min; }
-            if (Mode == "设定起始") {; }
+            if (Mode == "前几个项") { Max = Min - 1; Min = 0; }
+            if (Mode == "后几个项") { Max = IN.Count - 1; Min = Max - Min + 1; }
+            if (Mode == "设定起始") { Max -= 1;Min -= 1; }
             List<ITEM> OUT = new List<ITEM>();
             for (int i = 0; i < IN.Count; i++)
             {
@@ -750,6 +813,7 @@ namespace ZJYC
         public IMPORT Import;
         public EXPORT Export;
         public MULTIS Mulits;
+        public NEXUSX Nexusx;
         public int CurSelectedIndex = -1;
 
         public GUI()
@@ -762,6 +826,7 @@ namespace ZJYC
             Import = new IMPORT(ref Items);
             Export = new EXPORT(ref Items);
             Mulits = new MULTIS(ref Items);
+            Nexusx = new NEXUSX(ref Items);
         }
 
         public int ImportItems()
@@ -779,9 +844,9 @@ namespace ZJYC
             {
                 Show.Add(new CacheForTable()
                 {
-                    Type = Item.MainBody["Type"],
-                    JP = Item.MainBody["JP"],
-                    CH = Item.MainBody["CH"],
+                    Type = Item.MainBody["DicTyp"],
+                    JP = Item.MainBody["JPWord"],
+                    CH = Item.MainBody["CHWord"],
                     ErrorRate = Item.MainBody["ErrorRate"],
                     LearnCount = Item.MainBody["LearnCount"],
                     ErrorCount = Item.MainBody["ErrorCount"],
@@ -977,7 +1042,7 @@ namespace ZJYC
 
         }
     }
-    public class NEXUS
+    public class NEXUSX
     {
 
         public class OUT
@@ -999,7 +1064,7 @@ namespace ZJYC
         public List<int> IndexRandom = new List<int>();
         public List<int> IndexSelect = new List<int>();
 
-        public NEXUS(ref ITEMS Items)
+        public NEXUSX(ref ITEMS Items)
         {
             this.Items = Items;
         }
@@ -1016,25 +1081,28 @@ namespace ZJYC
             IndexSelect = (Mode == "随机" ? IndexRandom : IndexSelect);
         }
 
-        public void GetOneToShow(string KeyForQuestion,string KeyForAnswer,List<string> ShowForQuestion,List<string> ShowForAnswer)
+        public void GetOneToShow(List<string> Match,List<string> Result)
         {
-            if (IndexSelect.Count <= 0) int.Parse("");
+            if (IndexSelect.Count <= 0)
+            {
+                MessageBox.Show("列表已为空");
+                return;
+            }
             int Index = IndexSelect[0];
             IndexSelect.Remove(Index);
 
-            List<ITEM> SimItems = Text.FindTopSim(ref Items,
-                new List<string> { KeyForQuestion },
-                new List<string> { KeyForAnswer },
-                Internal[Index].UniqueID, 4);
+            List<string> KeyOfVal = new List<string>();
+            foreach (string str in Match) KeyOfVal.Add(Items.GetValOfKey(str,Internal[Index]));
+            List<ITEM> SimItems = Text.FindTopSim(ref Items,Match,KeyOfVal,Internal[Index].UniqueID, 4);
 
             Out.Title = "";
 
-            foreach (string str in ShowForQuestion)
+            foreach (string str in Result)
             {
                 string Temp = "";
                 if (Internal[Index].MainBody.TryGetValue(str, out Temp))
                 {
-                    Out.Title += Temp;
+                    Out.Title += Temp + "\r\n";
                 }
             }
 
@@ -1044,11 +1112,11 @@ namespace ZJYC
             {
                 string Temp = "";
                 string Answer = "";
-                foreach (string str in ShowForAnswer)
+                foreach (string str in Result)
                 {
                     if (SimItems[i].MainBody.TryGetValue(str, out Temp))
                     {
-                        Answer += Temp;
+                        Answer += Temp + "\r\n";
                     }
                 }
                 Out.Related.Add(Answer);

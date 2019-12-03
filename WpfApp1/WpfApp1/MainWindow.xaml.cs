@@ -51,6 +51,12 @@ namespace WpfApp1
             MutilSeclectMode.ItemsSource = Gui.Mulits.SupportedMode;
             MutilSeclectMode.SelectedIndex = 0;
 
+            NexusMode.ItemsSource = Gui.Nexusx.SupportedMode;
+            NexusMode.SelectedIndex = 0;
+
+            NexusParam.ItemsSource = Gui.Items.GetAllKey();
+            NexusParam.SelectedIndex = 0;
+
             UpdateListView();
         }
 
@@ -94,6 +100,9 @@ namespace WpfApp1
         {
             if (Gui.CurSelectedIndex < 0) return;
             Gui.Items.Del(Gui.Internal[Gui.CurSelectedIndex].UniqueID);
+            Gui.Items.Writ();
+            Gui.Items.Read();
+            UpdateListView();
         }
 
         private void OpenDicButton_Click(object sender, RoutedEventArgs e)
@@ -172,6 +181,7 @@ namespace WpfApp1
                     Gui.Mulits.ImportItems(ref Gui.Internal,(string)MutilSeclectMode.SelectedValue);
                 }
             }
+            UpdateListView();
         }
 
         #region 选择题
@@ -189,35 +199,47 @@ namespace WpfApp1
         private void MutilSeclectAdd2QSButton_Click(object sender, RoutedEventArgs e)
         {
             MutilSeclectQSParam.Text = MutilSeclectParamShow.Text;
+            MutilSeclectParamShow.Text = "";
         }
 
         private void MutilSeclectAdd2ASButton_Click(object sender, RoutedEventArgs e)
         {
             MutilSeclectASParam.Text = MutilSeclectParamShow.Text;
+            MutilSeclectParamShow.Text = "";
         }
 
         private void MutilSeclectAdd2KQButton_Click(object sender, RoutedEventArgs e)
         {
             MutilSeclectKQParam.Text = MutilSeclectParamShow.Text;
+            MutilSeclectParamShow.Text = "";
         }
 
-        private void MutilSeclectAdd2KAButton_Click(object sender, RoutedEventArgs e)
-        {
-            MutilSeclectKAParam.Text = MutilSeclectParamShow.Text;
-        }
 
         private void MutilSeclectBegin_Click(object sender, RoutedEventArgs e)
         {
-            MutilSeclectAns1.Background = new SolidColorBrush(Color.FromArgb(0xff, 0x04, 0xe0, 0xae));
-            MutilSeclectAns2.Background = new SolidColorBrush(Color.FromArgb(0xff, 0x04, 0xe0, 0xae));
-            MutilSeclectAns3.Background = new SolidColorBrush(Color.FromArgb(0xff, 0x04, 0xe0, 0xae));
-            MutilSeclectAns4.Background = new SolidColorBrush(Color.FromArgb(0xff, 0x04, 0xe0, 0xae));
+            MutilSeclectRes.Text = "";
 
-            string KeyForQuestion = MutilSeclectKQParam.Text.Replace("\r\n", "");
-            string KeyForAnswer = MutilSeclectKAParam.Text.Replace("\r\n", "");
+            MutilSeclectAnsTxt1.Background = new SolidColorBrush(Color.FromArgb(0xff, 0x04, 0xe0, 0xae));
+            MutilSeclectAnsTxt2.Background = new SolidColorBrush(Color.FromArgb(0xff, 0x04, 0xe0, 0xae));
+            MutilSeclectAnsTxt3.Background = new SolidColorBrush(Color.FromArgb(0xff, 0x04, 0xe0, 0xae));
+            MutilSeclectAnsTxt4.Background = new SolidColorBrush(Color.FromArgb(0xff, 0x04, 0xe0, 0xae));
+
+            List<string> KeyForQuestion = MutilSeclectKQParam.Text.Replace("\r\n", "").Split().ToList();
             List<string> ShowForQuestion = MutilSeclectQSParam.Text.Replace("\r\n"," ").Split().ToList();
             List<string> ShowForAnswer = MutilSeclectASParam.Text.Replace("\r\n", " ").Split().ToList();
+            List<string> ShowForRes = MutilSeclectResShow.Text.Replace("\r\n", " ").Split().ToList();
 
+            for (int i = 0; i < KeyForQuestion.Count;)
+            {
+                if (KeyForQuestion[i] == "")
+                {
+                    KeyForQuestion.Remove(KeyForQuestion[i]);
+                }
+                else
+                {
+                    i++;
+                }
+            }
             for (int i = 0; i < ShowForQuestion.Count;)
             {
                 if (ShowForQuestion[i] == "")
@@ -229,7 +251,6 @@ namespace WpfApp1
                     i++;
                 }
             }
-
             for (int i = 0; i < ShowForAnswer.Count;)
             {
                 if (ShowForAnswer[i] == "")
@@ -241,19 +262,33 @@ namespace WpfApp1
                     i++;
                 }
             }
+            for (int i = 0; i < ShowForRes.Count;)
+            {
+                if (ShowForRes[i] == "")
+                {
+                    ShowForRes.Remove(ShowForRes[i]);
+                }
+                else
+                {
+                    i++;
+                }
+            }
 
-            Gui.Mulits.GenOneQuestion(KeyForQuestion, KeyForAnswer, ShowForQuestion, ShowForAnswer);
+            Gui.Mulits.GenOneQuestion(KeyForQuestion, ShowForQuestion, ShowForAnswer, ShowForRes);
             MutilSeclectQuestion.Text = Gui.Mulits.Out.Question;
-            MutilSeclectAns1.Text = Gui.Mulits.Out.Options[0];
-            MutilSeclectAns2.Text = Gui.Mulits.Out.Options[1];
-            MutilSeclectAns3.Text = Gui.Mulits.Out.Options[2];
-            MutilSeclectAns4.Text = Gui.Mulits.Out.Options[3];
+            MutilSeclectAnsTxt1.Text = Gui.Mulits.Out.Options[0];
+            MutilSeclectAnsTxt2.Text = Gui.Mulits.Out.Options[1];
+            MutilSeclectAnsTxt3.Text = Gui.Mulits.Out.Options[2];
+            MutilSeclectAnsTxt4.Text = Gui.Mulits.Out.Options[3];
+
+            MutilSeclectRemainCount.Text = Gui.Mulits.GetRemain().ToString();
+
         }
 
-        public bool JudgeUsersSelection(ref TextBox Text)
+        public bool JudgeUsersSelection(ref TextBlock Text)
         {
             Gui.Mulits.Out.UserSelected = Text.Text;
-            MutilSeclectRes.Text = Gui.Mulits.Out.RightAnswer;
+            MutilSeclectRes.Text = Gui.Mulits.Out.Result;
             if (Gui.Mulits.JudgeTheAnswer() == true)
             {
                 Text.Background = new SolidColorBrush(Colors.Green);
@@ -266,27 +301,133 @@ namespace WpfApp1
             }
         }
 
-        private void MutilSeclectAns1_TextChanged(object sender, TextChangedEventArgs e)
+        private void MutilSeclectAnsButton1_Click(object sender, RoutedEventArgs e)
         {
-            JudgeUsersSelection(ref MutilSeclectAns1);
+            JudgeUsersSelection(ref MutilSeclectAnsTxt1);
         }
 
-        private void MutilSeclectAns2_TextChanged(object sender, TextChangedEventArgs e)
+        private void MutilSeclectAnsButton2_Click(object sender, RoutedEventArgs e)
         {
-            JudgeUsersSelection(ref MutilSeclectAns2);
+            JudgeUsersSelection(ref MutilSeclectAnsTxt2);
         }
 
-        private void MutilSeclectAns3_TextChanged(object sender, TextChangedEventArgs e)
+        private void MutilSeclectAnsButton3_Click(object sender, RoutedEventArgs e)
         {
-            JudgeUsersSelection(ref MutilSeclectAns3);
+            JudgeUsersSelection(ref MutilSeclectAnsTxt3);
         }
 
-        private void MutilSeclectAns4_TextChanged(object sender, TextChangedEventArgs e)
+        private void MutilSeclectAnsButton4_Click(object sender, RoutedEventArgs e)
         {
-            JudgeUsersSelection(ref MutilSeclectAns4);
+            JudgeUsersSelection(ref MutilSeclectAnsTxt4);
         }
+
 
         #endregion
 
+        private void FilterMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Gui.Filter.Mode = (string)FilterMode.SelectedValue;
+        }
+
+        private void SorterMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Gui.Sorter.Mode = (string)SorterMode.SelectedValue;
+        }
+
+        private void SelectMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Gui.Select.Mode = (string)SelectMode.SelectedValue;
+        }
+
+        private void FilterParam_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Gui.Filter.Param = FilterParam.Text;
+        }
+
+        private void SelectParam_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Gui.Select.Param = SelectParam.Text;
+        }
+
+        private void MutilSeclectAdd2RSButton_Click(object sender, RoutedEventArgs e)
+        {
+            MutilSeclectResShow.Text = MutilSeclectParamShow.Text;
+            MutilSeclectParamShow.Text = "";
+        }
+
+        private void NexusMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Gui.Nexusx.ImportItems(ref Gui.Internal, (string)NexusMode.SelectedValue);
+        }
+
+        private void MutilSeclectMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Gui.Mulits.ImportItems(ref Gui.Internal, (string)MutilSeclectMode.SelectedValue);
+        }
+
+        private void NexusParam_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            NexusParamShow.Text += (string)NexusParam.SelectedValue + "\r\n";
+        }
+
+        private void NexusAdd2MatchButton_Click(object sender, RoutedEventArgs e)
+        {
+            NexusMatchParam.Text = NexusParamShow.Text;
+            NexusParamShow.Text = "";
+        }
+
+        private void NexusAdd2ResButton_Click(object sender, RoutedEventArgs e)
+        {
+            NexusResParam.Text = NexusParamShow.Text;
+            NexusParamShow.Text = "";
+        }
+
+        private void NexusClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            NexusParamShow.Text = "";
+        }
+
+        private void NexusBeginOrNextButton_Click(object sender, RoutedEventArgs e)
+        {
+            List<string> KeyForMatch = NexusMatchParam.Text.Replace("\r\n", " ").Split().ToList();
+            List<string> KeyForResut = NexusResParam.Text.Replace("\r\n", " ").Split().ToList();
+
+            for (int i = 0; i < KeyForMatch.Count;)
+            {
+                if (KeyForMatch[i] == "")
+                {
+                    KeyForMatch.Remove(KeyForMatch[i]);
+                }
+                else
+                {
+                    i++;
+                }
+            }
+            for (int i = 0; i < KeyForResut.Count;)
+            {
+                if (KeyForResut[i] == "")
+                {
+                    KeyForResut.Remove(KeyForResut[i]);
+                }
+                else
+                {
+                    i++;
+                }
+            }
+
+            Gui.Nexusx.GetOneToShow(KeyForMatch, KeyForResut);
+            MutilSeclectQuestion.Text = Gui.Mulits.Out.Question;
+            NexusTitle.Text = Gui.Nexusx.Out.Title;
+            NexusOptions1.Text = Gui.Nexusx.Out.Related[0];
+            NexusOptions2.Text = Gui.Nexusx.Out.Related[1];
+            NexusOptions3.Text = Gui.Nexusx.Out.Related[2];
+            NexusOptions4.Text = Gui.Nexusx.Out.Related[3];
+            NexusRemainCount.Text = Gui.Nexusx.GetRemain().ToString();
+        }
+
+        private void MutilSeclectAdd2KAButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

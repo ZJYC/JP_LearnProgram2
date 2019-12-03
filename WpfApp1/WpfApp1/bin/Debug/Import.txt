@@ -1,28 +1,65 @@
-$JP         $ksdfhkas
-$CH         $啊啊啊啊
-$Type       $单词
-$JPEX1      $adsfghksdhglksdfh
-$CHEX1      $adsfghksdhglksdfh
-$USAGE      $adsfghksdhglksdfh
-$HRGN       $adsfghksdhglksdfh
+$DicTyp     $11111111
+$JPWord     $11111111
+$CHWord     $11111111
+$JPEmp1     $11111111
+$CHEmp1     $11111111
+$JPkana     $11111111
 
-$JP         $ksdfhkas
-$CH         $啊啊啊啊
-$Type       $单词
-$JPEX1      $adsfghksdhglksdfh
-$CHEX1      $adsfghksdhglksdfh
-$USAGE      $adsfghksdhglksdfh
-$HRGN       $adsfghksdhglksdfh
+$DicTyp     $22222222
+$JPWord     $22222222
+$CHWord     $22222222
+$JPEmp1     $22222222
+$CHEmp1     $22222222
+$JPkana     $22222222
 
-$JP         $ksdfhkas
-$CH         $啊啊啊啊
-$Type       $单词
-$JPEX1      $adsfghksdhglksdfh
-$CHEX1      $adsfghksdhglksdfh
-$USAGE      $adsfghksdhglksdfh
-$HRGN       $adsfghksdhglksdfh
+$DicTyp     $33333333
+$JPWord     $33333333
+$CHWord     $33333333
+$JPEmp1     $33333333
+$CHEmp1     $33333333
+$JPkana     $33333333
 
+$DicTyp     $44444444
+$JPWord     $44444444
+$CHWord     $44444444
+$JPEmp1     $44444444
+$CHEmp1     $44444444
+$JPkana     $44444444
 
+$DicTyp     $55555555
+$JPWord     $55555555
+$CHWord     $55555555
+$JPEmp1     $55555555
+$CHEmp1     $55555555
+$JPkana     $55555555
+
+$DicTyp     $66666666
+$JPWord     $66666666
+$CHWord     $66666666
+$JPEmp1     $66666666
+$CHEmp1     $66666666
+$JPkana     $66666666
+
+$DicTyp     $77777777
+$JPWord     $77777777
+$CHWord     $77777777
+$JPEmp1     $77777777
+$CHEmp1     $77777777
+$JPkana     $77777777
+
+$DicTyp     $88888888
+$JPWord     $88888888
+$CHWord     $88888888
+$JPEmp1     $88888888
+$CHEmp1     $88888888
+$JPkana     $88888888
+
+$DicTyp     $99999999
+$JPWord     $99999999
+$CHWord     $99999999
+$JPEmp1     $99999999
+$CHEmp1     $99999999
+$JPkana     $99999999
 
 
 
