@@ -169,10 +169,18 @@ namespace ZJYC
     public class ITEM
     {
         public int UniqueID = 0;
+        //DicTyp
+        //JPkana
+        //JPProp
+        //JPEmp1
+        //JPWord
+        //JPUsed
+        //CHWord
+        //CHEmp1
         public Dictionary<string, string> MainBody = new Dictionary<string, string>() {
-            {"Type","单词" },
-            {"JP","XXX" },
-            {"CH","XXX" },
+            {"DicTyp","单词" },
+            {"JPWord","XXX" },
+            {"CHWord","XXX" },
             {"ErrorRate","0.0"},
             {"LearnCount","1" },
             {"ErrorCount","0" },
@@ -247,12 +255,14 @@ namespace ZJYC
         public List<int> List(List<int> Tem)
         {
             List<int> Res = new List<int>();
-            int Count = Tem.Count;
+            List<int> XXX = new List<int>();
+            foreach (int i in Tem) XXX.Add(i);
+            int Count = XXX.Count;
             for (int i = 0; i < Count; i++)
             {
-                int DstIndex = Random(0, Tem.Count - 1);
-                Res.Insert(i, Tem[DstIndex]);
-                Tem.Remove(Tem[DstIndex]);
+                int DstIndex = Random(0, XXX.Count - 1);
+                Res.Insert(i, XXX[DstIndex]);
+                XXX.Remove(XXX[DstIndex]);
             }
             return Res;
         }
@@ -348,7 +358,7 @@ namespace ZJYC
             return Res;
         }
     }
-    public class QU_MULTI
+    public class MULTIS
     {
         public class OUT
         {
@@ -362,7 +372,7 @@ namespace ZJYC
         public string Mode = string.Empty;
         public List<string> SupportedMode = new List<string>(){ "顺序", "随机", };
         ITEMS Items;
-        public QU_MULTI(ref ITEMS Items)
+        public MULTIS(ref ITEMS Items)
         {
             this.Items = Items;
         }
@@ -440,6 +450,10 @@ namespace ZJYC
                 Items.Mod(Out.IdSelected, 1);
                 return false;
             }
+        }
+        public int GetRemain()
+        {
+            return IndexSelect.Count;
         }
     }
     public class PARAM
@@ -735,6 +749,7 @@ namespace ZJYC
         public SEARCH Search;
         public IMPORT Import;
         public EXPORT Export;
+        public MULTIS Mulits;
         public int CurSelectedIndex = -1;
 
         public GUI()
@@ -746,6 +761,7 @@ namespace ZJYC
             Search = new SEARCH(ref Items);
             Import = new IMPORT(ref Items);
             Export = new EXPORT(ref Items);
+            Mulits = new MULTIS(ref Items);
         }
 
         public int ImportItems()
@@ -961,6 +977,91 @@ namespace ZJYC
 
         }
     }
+    public class NEXUS
+    {
+
+        public class OUT
+        {
+            public string Title = string.Empty;
+            public List<string> Related = new List<string>();
+        }
+
+        public OUT Out = new OUT();
+        public string Mode = string.Empty;
+        public List<string> SupportedMode = new List<string>() { "顺序","随机"};
+
+        ITEMS Items;
+        GENLIST GenList = new GENLIST();
+        TEXT Text = new TEXT();
+
+        public List<ITEM> Internal = new List<ITEM>();
+        public List<int> IndexRegulr = new List<int>();
+        public List<int> IndexRandom = new List<int>();
+        public List<int> IndexSelect = new List<int>();
+
+        public NEXUS(ref ITEMS Items)
+        {
+            this.Items = Items;
+        }
+
+        public void ImportItems(ref List<ITEM> Base, string Mode)
+        {
+            Internal.Clear();
+            IndexRegulr.Clear();
+            IndexRandom.Clear();
+            Items.CopyItems(ref Base, ref Internal);
+            IndexRegulr = GenList.OrderList(0, Base.Count - 1);
+            IndexRandom = GenList.List(IndexRegulr);
+            IndexSelect = (Mode == "顺序" ? IndexRegulr : IndexSelect);
+            IndexSelect = (Mode == "随机" ? IndexRandom : IndexSelect);
+        }
+
+        public void GetOneToShow(string KeyForQuestion,string KeyForAnswer,List<string> ShowForQuestion,List<string> ShowForAnswer)
+        {
+            if (IndexSelect.Count <= 0) int.Parse("");
+            int Index = IndexSelect[0];
+            IndexSelect.Remove(Index);
+
+            List<ITEM> SimItems = Text.FindTopSim(ref Items,
+                new List<string> { KeyForQuestion },
+                new List<string> { KeyForAnswer },
+                Internal[Index].UniqueID, 4);
+
+            Out.Title = "";
+
+            foreach (string str in ShowForQuestion)
+            {
+                string Temp = "";
+                if (Internal[Index].MainBody.TryGetValue(str, out Temp))
+                {
+                    Out.Title += Temp;
+                }
+            }
+
+            Out.Related.Clear();
+
+            for (int i = 0; i < 4; i++)
+            {
+                string Temp = "";
+                string Answer = "";
+                foreach (string str in ShowForAnswer)
+                {
+                    if (SimItems[i].MainBody.TryGetValue(str, out Temp))
+                    {
+                        Answer += Temp;
+                    }
+                }
+                Out.Related.Add(Answer);
+            }
+        }
+
+        public int GetRemain()
+        {
+            return IndexSelect.Count;
+        }
+
+    }
+
 }
 namespace TextOpt
 {
