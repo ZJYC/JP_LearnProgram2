@@ -953,6 +953,7 @@ namespace ZJYC
             Content = Content.Replace("  ", " ");
             string[] Sub = Content.Split(' ');
             List<ITEM> ItemList = new List<ITEM>();
+            MessageBox.Show("即将导入" + Sub.Length.ToString());
             foreach(string Segment in Sub)
             {
                 if(Segment != "")
@@ -961,6 +962,7 @@ namespace ZJYC
                     string[] Line = Segment.Split(new string[] { "\r\n" }, StringSplitOptions.None);
                     foreach(string Element in Line)
                     {
+                        if (Element == "") continue;
                         string [] E = Element.Split('$');
                         string Key = E[1];
                         string Val = E[2];

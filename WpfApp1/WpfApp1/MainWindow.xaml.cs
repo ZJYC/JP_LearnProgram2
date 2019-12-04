@@ -291,12 +291,12 @@ namespace WpfApp1
             MutilSeclectRes.Text = Gui.Mulits.Out.Result;
             if (Gui.Mulits.JudgeTheAnswer() == true)
             {
-                Text.Background = new SolidColorBrush(Colors.Green);
+                Text.Background = new SolidColorBrush(Color.FromArgb(0xff, 0x79, 0xFF, 0x00));
                 return true;
             }
             else
             {
-                Text.Background = new SolidColorBrush(Colors.Red);
+                Text.Background = new SolidColorBrush(Colors.OrangeRed);
                 return false;
             }
         }
