@@ -897,8 +897,10 @@ namespace ZJYC
                     string Content = Reader.ReadToEnd();
                     List<int> ErrorLine = new List<int>();
                     Content = Content.Replace(" ", "");
-                    Content = Content.Replace("\r\n\r\n", "\r\n");
-                    Content = Content.Replace("\r\n"," ");
+                    
+                    //Content = Content.Replace("System.Environment.NewLine", " ");
+                    Content = Content.Replace("\n\n", "\n");
+                    Content = Content.Replace("\n"," ");
                     string[] SunString = Content.Split(' ');
 
                     for (int i = 0;i < SunString.Length; i++)
@@ -949,7 +951,7 @@ namespace ZJYC
 
             JsonFile.ReadStringFrJsonFile(ImportFileName, ref Content);
             Content = Content.Replace(" ","");
-            Content = Content.Replace("\r\n\r\n", " ");
+            Content = Content.Replace("\n\n", " ");
             Content = Content.Replace("  ", " ");
             string[] Sub = Content.Split(' ');
             List<ITEM> ItemList = new List<ITEM>();
@@ -959,7 +961,7 @@ namespace ZJYC
                 if(Segment != "")
                 {
                     ITEM Item = new ITEM();
-                    string[] Line = Segment.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+                    string[] Line = Segment.Split(new string[] { "\n" }, StringSplitOptions.None);
                     foreach(string Element in Line)
                     {
                         if (Element == "") continue;
