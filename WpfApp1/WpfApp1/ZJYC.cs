@@ -42,7 +42,7 @@ namespace ZJYC
             }
         }
 
-    }
+   }
     public class ITEMS
     {
         private FILEOPT JsonFile = new FILEOPT();
@@ -286,6 +286,119 @@ namespace ZJYC
             public double Sim;
             public int ID;
         }
+
+        private double Sim2(string txt1, string txt2)
+        {
+            List<char> sl1 = txt1.ToCharArray().ToList();
+            List<char> sl2 = txt2.ToCharArray().ToList();
+            Dictionary<string, int> Dict = new Dictionary<string, int>();
+            for(int i = 0;i < sl1.Count;i++)
+            {
+                for (int j = 2; j <= sl1.Count - i;j++)
+                {
+                    Dict[txt1.Substring(i, j).ToString()] = 0;
+                }
+            }
+            for (int i = 0; i < sl2.Count; i++)
+            {
+                for (int j = 2; j <= sl2.Count - i; j++)
+                {
+                    Dict[txt2.Substring(i, j).ToString()] = 0;
+                }
+            }
+
+            List<string> Keys = new List<string>(Dict.Keys);
+
+            foreach(string tmp in Keys)
+            {
+                if (txt1.Contains(tmp)) Dict[tmp] = Dict[tmp] + 1;
+                if (txt2.Contains(tmp)) Dict[tmp] = Dict[tmp] + 1;
+            }
+
+            foreach(string tmp in Keys)
+            {
+                if (Dict[tmp] <= 1) Dict.Remove(tmp);
+            }
+
+            Keys = new List<string>(Dict.Keys);
+            foreach (string tmp in Keys)
+            {
+                foreach (string key in Dict.Keys)
+                {
+                    if (key.Contains(tmp) && tmp != key)
+                    {
+                        Dict.Remove(tmp);
+                        break;
+                    }
+                }
+            }
+
+            double Param1 = 0;
+
+            foreach(string tmp in Dict.Keys)
+            {
+                Param1 += tmp.Length * Dict[tmp];
+            }
+
+            Param1 /= (txt1.Length + txt2.Length);
+
+            List<double> Vect1 = new List<double>();
+            List<double> Vect2 = new List<double>();
+            Vect1.Add(0);
+            Vect2.Add(0);
+            Vect1.Add(txt1.Length);
+            Vect2.Add(txt2.Length);
+            foreach (string tmp in Dict.Keys)
+            {
+                int Index1 = 0, Index2 = 0, Count1 = 0, Count2 = 0,CountMax = 0;
+                while ((Index1 = txt1.IndexOf(tmp, Index1)) != -1)
+                {
+                    Index1 += tmp.Length;
+                    Count1++;
+                }
+                while ((Index2 = txt2.IndexOf(tmp, Index2)) != -1)
+                {
+                    Index2 += tmp.Length;
+                    Count2++;
+                }
+                CountMax = (Count1 <= Count2 ? Count2 : Count1);
+                Index1 = Index2 = 0;
+
+                for (int i = 0;i < CountMax; i++)
+                {
+                    Index1 = txt1.IndexOf(tmp, Index1);
+                    Vect1.Add(((Index1 <= -1 ? 0 : Index1) + 1) + txt1.Length);
+                    Index1 += tmp.Length;
+
+                    Index2 = txt2.IndexOf(tmp, Index2);
+                    Vect2.Add(((Index2 <= -1 ? 0 : Index2) + 1) + txt2.Length);
+                    Index2 += tmp.Length;
+
+                }
+            }
+
+            double num = 0;
+            double numA = 0;
+            double numB = 0;
+            for (int i = 0; i < Vect1.Count; i++)
+            {
+                num += Vect1[i] * Vect2[i];
+                numA += Math.Pow(Vect1[i], 2);
+                numB += Math.Pow(Vect2[i], 2);
+            }
+            double cos = num / (Math.Sqrt(numA) * Math.Sqrt(numB));
+            if ((Math.Sqrt(numA) * Math.Sqrt(numB)) == 0) cos = 0;
+            cos = (cos <= 0 ? 0 : cos);
+            cos = (cos >= 1 ? 1 : cos);
+
+            cos = cos * 0.5 + Param1 * 0.5;
+
+            cos = (cos <= 0 ? 0 : cos);
+            cos = (cos >= 1 ? 1 : cos);
+
+            return cos;
+        }
+
         public double Sim(string txt1, string txt2)
         {
             List<char> sl1 = txt1.ToCharArray().ToList();
@@ -312,7 +425,21 @@ namespace ZJYC
                 numA += Math.Pow(arrA[i], 2);
                 numB += Math.Pow(arrB[i], 2);
             }
-            double cos = num / (Math.Sqrt(numA) * Math.Sqrt(numB));
+            double cos1 = num / (Math.Sqrt(numA) * Math.Sqrt(numB));
+            cos1 = (cos1 <= 0 ? 0 : cos1);
+            cos1 = (cos1 >= 1 ? 1 : cos1);
+            double cos2 = Sim2(txt1, txt2);
+            double cos = 0;
+            if(cos2 == 0)
+            {
+                cos = cos1;
+            }
+            else
+            {
+                cos = cos2 * 0.5 + cos1 * 0.5;
+            }
+            cos = (cos <= 0 ? 0 : cos);
+            cos = (cos >= 1 ? 1 : cos);
             return cos;
         }
         public double Sim(ITEM Item, List<string> Keys, List<string> Vals)
@@ -361,10 +488,18 @@ namespace ZJYC
                 ResTemp.Add(new SimRes() { Sim = Sim(Item, Keys, Vals),ID = Item.UniqueID, });
             }
             ResTemp.Sort(SortList);
-
+            int j = 0;
             for(int i = 0;i < TopX;i++)
             {
-                Res.Add(Items.Internal[Items.GetIndexByID(ResTemp[i].ID)]);
+                if(Vals[0] != Items.Internal[Items.GetIndexByID(ResTemp[j].ID)].MainBody[Keys[0]])
+                {
+                    Res.Add(Items.Internal[Items.GetIndexByID(ResTemp[j].ID)]);
+                }
+                else
+                {
+                    i--;
+                }
+                j++;
             }
 
             return Res;
@@ -767,7 +902,7 @@ namespace ZJYC
             foreach (string str in Item.MainBody.Keys) Keys.Add(str);
             foreach (string str in Keys)
             {
-                if (Text.Sim(Item.MainBody[str], Keyword) >= 0.2)
+                if (Text.Sim(Item.MainBody[str], Keyword) >= 0.9)
                 {
                     return false;
                 }
@@ -943,17 +1078,17 @@ namespace ZJYC
                 return;
             }
 
-            if(ChkFileForImport(ImportFileName) != true)
-            {
-                MessageBox.Show("文件格式不对啊");
-                return;
-            }
+            //if(ChkFileForImport(ImportFileName) != true)
+            //{
+            //    MessageBox.Show("文件格式不对啊");
+            //    return;
+            //}
 
             JsonFile.ReadStringFrJsonFile(ImportFileName, ref Content);
-            Content = Content.Replace(" ","");
-            Content = Content.Replace("\n\n", " ");
-            Content = Content.Replace("  ", " ");
-            string[] Sub = Content.Split(' ');
+            Content = Content.Replace("$#", "|");
+            Content = Content.Replace("\r", "");
+            Content = Content.Replace("\n", "");
+            string[] Sub = Content.Split('|');
             List<ITEM> ItemList = new List<ITEM>();
             MessageBox.Show("即将导入" + Sub.Length.ToString());
             foreach(string Segment in Sub)
@@ -961,7 +1096,7 @@ namespace ZJYC
                 if(Segment != "")
                 {
                     ITEM Item = new ITEM();
-                    string[] Line = Segment.Split(new string[] { "\n" }, StringSplitOptions.None);
+                    string[] Line = Segment.Split(new string[] { "#" }, StringSplitOptions.None);
                     foreach(string Element in Line)
                     {
                         if (Element == "") continue;
@@ -1028,16 +1163,16 @@ namespace ZJYC
 
             foreach(ITEM Item in Items)
             {
-                int MaxKeyLen = 0;
+                //int MaxKeyLen = 0;
+                //foreach (string Key in Item.MainBody.Keys)
+                //{
+                //    MaxKeyLen = (MaxKeyLen < Key.Length ? Key.Length : MaxKeyLen);
+                //}
                 foreach (string Key in Item.MainBody.Keys)
                 {
-                    MaxKeyLen = (MaxKeyLen < Key.Length ? Key.Length : MaxKeyLen);
+                    ExportString += "$" + Key + "$" + Item.MainBody[Key] + "#\r\n";
                 }
-                foreach (string Key in Item.MainBody.Keys)
-                {
-                    ExportString += "$ " + Key + GetSpecificLenOfSpace(MaxKeyLen - Key.Length) + " $ " + Item.MainBody[Key] + " \r\n";
-                }
-                ExportString += "\r\n";
+                ExportString += "$#\r\n";
             }
 
             File.WritStringToJsonFile(ExportFileName, ref ExportString);

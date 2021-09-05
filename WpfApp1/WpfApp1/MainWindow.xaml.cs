@@ -33,6 +33,8 @@ namespace WpfApp1
 
         public MainWindow()
         {
+            //TEXT tEXT = new TEXT();
+            //tEXT.Sim("きょうだい", "きょうだい");
             InitializeComponent();
             FilterMode.SelectedIndex = 0;
             FilterMode.ItemsSource = Gui.Filter.SupportedMode;
@@ -274,7 +276,7 @@ namespace WpfApp1
                 }
             }
 
-            Gui.Mulits.GenOneQuestion(KeyForQuestion, ShowForQuestion, ShowForAnswer, ShowForRes);
+            Gui.Mulits.GenOneQuestion(ShowForAnswer, ShowForQuestion, ShowForAnswer, ShowForRes);
             MutilSeclectQuestion.Text = Gui.Mulits.Out.Question;
             MutilSeclectAnsTxt1.Text = Gui.Mulits.Out.Options[0];
             MutilSeclectAnsTxt2.Text = Gui.Mulits.Out.Options[1];
@@ -426,6 +428,11 @@ namespace WpfApp1
         }
 
         private void MutilSeclectAdd2KAButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ItemsKeys_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
         }
