@@ -64,10 +64,17 @@ namespace ZJYC
         {
             int i = 0;
             foreach (ITEM Item in Internal)Item.UniqueID = i++;
-            string TempString = JsonConvert.SerializeObject(Internal);
-            JsonFile.WritStringToJsonFile(this.JsonFileName, ref TempString);
+            //string TempString = JsonConvert.SerializeObject(Internal);
+            //JsonFile.WritStringToJsonFile(JsonFileName, ref TempString);
             //CopyItems(ref Internal, ref External);
         }
+
+        public void Save()
+        {
+            string TempString = JsonConvert.SerializeObject(Internal);
+            JsonFile.WritStringToJsonFile(JsonFileName, ref TempString);
+        }
+
         public int GetIndexByID(int ID)
         {
             for (int i = 0; i < Internal.Count; i++)
@@ -193,6 +200,7 @@ namespace ZJYC
             {"DicTyp","单词" },
             {"JPWord","XXX" },
             {"CHWord","XXX" },
+            {"JPkana","XXX" },
             {"ErrorRate","0.0"},
             {"LearnCount","1" },
             {"ErrorCount","0" },
@@ -836,8 +844,8 @@ namespace ZJYC
         }
         private int SortByErrorRatex(ITEM A, ITEM B)
         {
-            int AE = int.Parse(A.MainBody["ErrorRate"]);
-            int BE = int.Parse(B.MainBody["ErrorRate"]);
+            double AE = double.Parse(A.MainBody["ErrorRate"]);
+            double BE = double.Parse(B.MainBody["ErrorRate"]);
             if (AE > BE) return -1;
             if (AE < BE) return 1;
             return 0;

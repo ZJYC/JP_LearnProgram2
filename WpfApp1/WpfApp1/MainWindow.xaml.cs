@@ -30,7 +30,10 @@ namespace WpfApp1
             ShowCount.Text = Gui.ImportItems().ToString();
             this.Dispatcher.BeginInvoke((Action)delegate () { GUI_Listview.ItemsSource = Gui.Show; });
         }
-
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Gui.Items.Save();
+        }
         public MainWindow()
         {
             //TEXT tEXT = new TEXT();
