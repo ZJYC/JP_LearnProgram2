@@ -47,6 +47,7 @@ namespace ZJYC
     {
         private FILEOPT JsonFile = new FILEOPT();
         public string JsonFileName = "Temp.json";
+        public string LastJsonFileName = "";
         public List<ITEM> Internal = new List<ITEM>();
         public void CopyItems(ref List<ITEM> Src, ref List<ITEM> Dst)
         {
@@ -55,9 +56,20 @@ namespace ZJYC
         }
         public void Read()
         {
-            string TempString = string.Empty;
-            JsonFile.ReadStringFrJsonFile(JsonFileName, ref TempString);
-            Internal = JsonConvert.DeserializeObject<List<ITEM>>(TempString);
+            if(LastJsonFileName != JsonFileName)
+            {
+                LastJsonFileName = JsonFileName;
+                string TempString = string.Empty;
+                JsonFile.ReadStringFrJsonFile(JsonFileName, ref TempString);
+                Internal = JsonConvert.DeserializeObject<List<ITEM>>(TempString);
+            }
+            else
+            {
+
+            }
+            //string TempString = string.Empty;
+            //JsonFile.ReadStringFrJsonFile(JsonFileName, ref TempString);
+            //Internal = JsonConvert.DeserializeObject<List<ITEM>>(TempString);
             //CopyItems(ref Internal,ref External);
         }
         public void Writ()
@@ -409,8 +421,10 @@ namespace ZJYC
 
         public double Sim(string txt1, string txt2)
         {
-            List<char> sl1 = txt1.ToCharArray().ToList();
-            List<char> sl2 = txt2.ToCharArray().ToList();
+            int Len1 = txt1.Length > 10 ? 10 : txt1.Length;
+            int Len2 = txt2.Length > 10 ? 10 : txt2.Length;
+            List<char> sl1 = txt1.Substring(0, Len1).ToCharArray().ToList();
+            List<char> sl2 = txt2.Substring(0, Len2).ToCharArray().ToList();
             //去重
             List<char> sl = sl1.Union(sl2).ToList<char>();
 
@@ -1012,70 +1026,15 @@ namespace ZJYC
         }
 
         private FILEOPT JsonFile = new FILEOPT();
-        //$JP$ksdfhkas
-        //$CH$啊啊啊啊
-        //$Type$单词
-        //$JPEX1$adsfghksdhglksdfh
-        //$CHEX1$adsfghksdhglksdfh
-        //$USAGE$adsfghksdhglksdfh
-        //$HRGN$adsfghksdhglksdfh
-
-        //$JP$ksdfhkas
-        //$CH$啊啊啊啊
-        //$Type$单词
-        //$JPEX1$adsfghksdhglksdfh
-        //$CHEX1$adsfghksdhglksdfh
-        //$USAGE$adsfghksdhglksdfh
-        //$HRGN$adsfghksdhglksdfh
-
-        public bool ChkFileForImport(string FileName)
+        private List<string> StringLineSplit(string Input)
         {
-            string Keyword = "$";
-
-            //List<string> Content = new List<string>();
-            try
-            {
-                using (StreamReader Reader = new StreamReader(FileName))
-                {
-                    string Content = Reader.ReadToEnd();
-                    List<int> ErrorLine = new List<int>();
-                    Content = Content.Replace(" ", "");
-                    
-                    //Content = Content.Replace("System.Environment.NewLine", " ");
-                    Content = Content.Replace("\n\n", "\n");
-                    Content = Content.Replace("\n"," ");
-                    string[] SunString = Content.Split(' ');
-
-                    for (int i = 0;i < SunString.Length; i++)
-                    {
-                        int Index = 0;
-                        int Count = 0;
-                        while ((Index = SunString[i].IndexOf(Keyword, Index)) != -1)
-                        {
-                            Count++;
-                            Index = Index + Keyword.Length;
-                        }
-                        if (SunString[i] != "" && Count != 2 && Count != 0)
-                        {
-                            ErrorLine.Add(i + 1);
-                        }
-                    }
-                    if (ErrorLine.Count != 0)
-                    {
-                        string Message = string.Empty;
-                        foreach (int i in ErrorLine) Message += i.ToString();
-                        MessageBox.Show("File error occur @ Line " + Message);
-                        return false;
-                    }
-                    return true;
-                }
-            }
-            catch
-            {
-                ;//MessageBox.Show("ReadStringFrJsonFile" + JsonFileName);
-            }
-            return false;
+            List<string> Ret = new List<string>();
+            Ret.AddRange(Input.Split('\t'));
+            return Ret;
         }
+        //xxx\tyyy\tzzz
+        //111\t111\t111
+        //222\t222\t222
 
         public void WORK(string ImportFileName,string JsonFileName)
         {
@@ -1085,49 +1044,41 @@ namespace ZJYC
                 MessageBox.Show("先创建一个字典吧");
                 return;
             }
-
-            //if(ChkFileForImport(ImportFileName) != true)
-            //{
-            //    MessageBox.Show("文件格式不对啊");
-            //    return;
-            //}
-
-            JsonFile.ReadStringFrJsonFile(ImportFileName, ref Content);
-            Content = Content.Replace("$#", "|");
-            Content = Content.Replace("\r", "");
-            Content = Content.Replace("\n", "");
-            string[] Sub = Content.Split('|');
-            List<ITEM> ItemList = new List<ITEM>();
-            MessageBox.Show("即将导入" + Sub.Length.ToString());
-            foreach(string Segment in Sub)
+            ////////////////////////////////////////////////////////
+            using (StreamReader sr = new StreamReader(ImportFileName))
             {
-                if(Segment != "")
+                string line;
+                List<ITEM> ItemList = new List<ITEM>();
+                List<string> Title = new List<string>();
+                while ((line = sr.ReadLine()) != null)
                 {
-                    ITEM Item = new ITEM();
-                    string[] Line = Segment.Split(new string[] { "#" }, StringSplitOptions.None);
-                    foreach(string Element in Line)
+                    if (Title.Count == 0)
                     {
-                        if (Element == "") continue;
-                        string [] E = Element.Split('$');
-                        string Key = E[1];
-                        string Val = E[2];
-                        string Temp = string.Empty;
-                        if(Item.MainBody.TryGetValue(Key,out Temp))
-                        {
-                            Item.MainBody[Key] = Val;
-                        }
-                        else
-                        {
-                            Item.MainBody.Add(Key,Val);
-                        }
+                        Title = StringLineSplit(line);
                     }
-                    ItemList.Add(Item);
+                    else
+                    {
+                        ITEM Item = new ITEM();
+                        List<string> Value = StringLineSplit(line);
+                        for (int i = 0; i < Title.Count; i++)
+                        {
+                            if (Item.MainBody.ContainsKey(Title[i]))
+                            {
+                                Item.MainBody[Title[i]] = Value[i] == "" ? Value[0] : Value[i];
+                            }
+                            else
+                            {
+                                Item.MainBody.Add(Title[i], Value[i] == "" ? Value[0] : Value[i]);
+                            }
+                        }
+                        ItemList.Add(Item);
+                    }
                 }
-            }
-            if(ItemList.Count != 0)
-            {
-                Items.Add(ItemList);
-                Items.Writ();
+                if (ItemList.Count != 0)
+                {
+                    Items.Add(ItemList);
+                    Items.Writ();
+                }
             }
 
         }

@@ -119,6 +119,10 @@ namespace WpfApp1
             fileDialog.Filter = "Json|*.json;";
             if (fileDialog.ShowDialog() == true)
             {
+                if (Gui.Items.JsonFileName != "")
+                {
+                    Gui.Items.Save();
+                }
                 DicName.Text = fileDialog.FileName;
                 Gui.Items.JsonFileName = DicName.Text;
                 Gui.Items.Read();
