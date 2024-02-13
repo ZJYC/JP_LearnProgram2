@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="MainWindow" Height="652.131" Width="900" ResizeMode="CanMinimize" FontSize="20" FontWeight="Bold"
-        Closing="Window_Closing">
+        Closing="Window_Closing"
+        KeyDown="Window_KeyDown">
     <Window.Resources>
         <Color x:Key="Button">#FF990C0C</Color>
     </Window.Resources>
@@ -68,25 +69,25 @@
                     <TextBox x:Name="MutilSeclectASParam" HorizontalAlignment="Left" Height="43" Margin="795,48,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="79" Foreground="#FF03097E" Background="#FF04E0AE" FontSize="11" Text="JPkana"/>
                     <Label Content="问题" HorizontalAlignment="Left" Margin="510,48,0,0" VerticalAlignment="Top" Background="#FF04E0AE" Foreground="#FF03097E" Width="106" Height="43" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                     <Label Content="选项" HorizontalAlignment="Left" Margin="695,48,0,0" VerticalAlignment="Top" Background="#FF04E0AE" Foreground="#FF03097E" Width="95" Height="43" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                    <Button x:Name="MutilSeclectBegin" Content="Begin Or Next" HorizontalAlignment="Left" VerticalAlignment="Top" Width="874" Height="59" Focusable="False" Background="#FF79FF00" Foreground="#FF03097E" Margin="0,144,0,0" Click="MutilSeclectBegin_Click"/>
+                    <Button x:Name="MutilSeclectBegin" Content="Begin Or Next" HorizontalAlignment="Left" VerticalAlignment="Top" Width="874" Height="59" Focusable="False" Background="#FF79FF00" Foreground="#FF03097E" Margin="0,505,0,0" Click="MutilSeclectBegin_Click"/>
                     <TextBox x:Name="MutilSeclectRemainCount" HorizontalAlignment="Left" Height="43" Margin="795,96,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="79" Foreground="#FF03097E" Background="#FF04E0AE" FontSize="22"/>
                     <Label Content="剩余" HorizontalAlignment="Left" Margin="695,96,0,0" VerticalAlignment="Top" Background="#FF04E0AE" Foreground="#FF03097E" Width="95" Height="43" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                     <TextBox x:Name="MutilSeclectQuestion" HorizontalAlignment="Left" Height="91" Margin="0,48,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="495" Foreground="#FF111111" Background="#FF04E0AE" FontSize="64" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                    <TextBox x:Name="MutilSeclectRes" HorizontalAlignment="Left" Height="188" Margin="0,376,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="874" Foreground="#FF03097E" Background="#FF04E0AE" FontSize="36"/>
+                    <TextBox x:Name="MutilSeclectRes" HorizontalAlignment="Left" Height="188" Margin="0,146,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="874" Foreground="#FF03097E" Background="#FF04E0AE" FontSize="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                     <TextBox x:Name="MutilSeclectKQParam" HorizontalAlignment="Left" Height="43" Margin="621,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="253" Foreground="#FF03097E" Background="#FF04E0AE" FontSize="11" Text="JPWord"/>
                     <Label Content="关键字" HorizontalAlignment="Left" Margin="510,0,0,0" VerticalAlignment="Top" Background="#FF04E0AE" Foreground="#FF03097E" Width="106" Height="43" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                     <Button x:Name="MutilSeclectAdd2KQButton" Content="到关键字" HorizontalAlignment="Left" VerticalAlignment="Top" Width="95" Height="43" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="0,48,0,0" Click="MutilSeclectAdd2KQButton_Click" Visibility="Hidden"/>
-                    <Button x:Name="MutilSeclectAnsButton1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="432" Height="79" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="0,208,0,0" Click="MutilSeclectAnsButton1_Click">
+                    <Button x:Name="MutilSeclectAnsButton1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="432" Height="79" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="0,339,0,0" Click="MutilSeclectAnsButton1_Click">
                         <TextBlock x:Name="MutilSeclectAnsTxt1" Text="" TextWrapping = "Wrap" Height="74" VerticalAlignment="Center" HorizontalAlignment="Center" Width="426" FontSize="18"/>
                     </Button>
-                    <Button x:Name="MutilSeclectAnsButton2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="432" Height="79" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="442,208,0,0" Click="MutilSeclectAnsButton2_Click">
+                    <Button x:Name="MutilSeclectAnsButton2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="432" Height="79" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="442,339,0,0" Click="MutilSeclectAnsButton2_Click">
                         <TextBlock x:Name="MutilSeclectAnsTxt2" Text="" TextWrapping = "Wrap" Height="69" VerticalAlignment="Center" HorizontalAlignment="Center" Width="426" FontSize="18"/>
                     </Button>
-                    <Button x:Name="MutilSeclectAnsButton3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="432" Height="79" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="0,292,0,0" Click="MutilSeclectAnsButton3_Click">
+                    <Button x:Name="MutilSeclectAnsButton3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="432" Height="79" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="0,422,0,0" Click="MutilSeclectAnsButton3_Click" RenderTransformOrigin="0.482,1.782">
                         <TextBlock x:Name="MutilSeclectAnsTxt3" Text="" TextWrapping = "Wrap" Height="72" VerticalAlignment="Center" HorizontalAlignment="Center" Width="426" FontSize="18"/>
                     </Button>
-                    <Button x:Name="MutilSeclectAnsButton4" HorizontalAlignment="Left" VerticalAlignment="Top" Width="432" Height="79" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="442,292,0,0" Click="MutilSeclectAnsButton4_Click">
-                        <TextBlock x:Name="MutilSeclectAnsTxt4" Text="" TextWrapping = "Wrap" Height="72" VerticalAlignment="Center" HorizontalAlignment="Center" Width="426" FontSize="18"/>
+                    <Button x:Name="MutilSeclectAnsButton4" HorizontalAlignment="Left" VerticalAlignment="Top" Width="432" Height="79" Focusable="False" Background="#FF04E0AE" Foreground="#FF03097E" Margin="442,422,0,0" Click="MutilSeclectAnsButton4_Click">
+                        <TextBlock x:Name="MutilSeclectAnsTxt4" Text="" TextWrapping = "Wrap" Height="72" VerticalAlignment="Center" HorizontalAlignment="Center" Width="426" FontSize="18" RenderTransformOrigin="0.487,1.422"/>
                     </Button>
                     <Label Content="结果" HorizontalAlignment="Left" Margin="510,96,0,0" VerticalAlignment="Top" Background="#FF04E0AE" Foreground="#FF03097E" Width="106" Height="43" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                     <TextBox x:Name="MutilSeclectResShow" HorizontalAlignment="Left" Height="43" Margin="621,96,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="69" Foreground="#FF03097E" Background="#FF04E0AE" FontSize="11" Text="JPWord&#xA;CHWord&#xA;JPEmp1&#xA;CHEmp1&#xD;&#xA;JPkana"/>

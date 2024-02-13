@@ -434,6 +434,34 @@ namespace WpfApp1
             NexusRemainCount.Text = Gui.Nexusx.GetRemain().ToString();
         }
 
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(MainTableControl.SelectedIndex == 1)
+            {
+                if (e.Key == Key.Enter || e.Key == Key.Space)
+                {
+                    MutilSeclectBegin_Click(null, null);
+                }
+                if(e.Key == Key.D1 || e.Key == Key.A) 
+                {
+                    MutilSeclectAnsButton1_Click(null,null);
+                }
+                if (e.Key == Key.D2 || e.Key == Key.S)
+                {
+                    MutilSeclectAnsButton2_Click(null, null);
+                }
+                if (e.Key == Key.D3 || e.Key == Key.D)
+                {
+                    MutilSeclectAnsButton3_Click(null, null);
+                }
+                if (e.Key == Key.D4 || e.Key == Key.F)
+                {
+                    MutilSeclectAnsButton4_Click(null, null);
+                }
+            }
+            
+        }
+
         private void MutilSeclectAdd2KAButton_Click(object sender, RoutedEventArgs e)
         {
 
